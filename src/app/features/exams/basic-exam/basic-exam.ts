@@ -1,13 +1,8 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-
-interface Question {
-  id: number;
-  greek: string;
-  english: string;
-  explanation: string;
-}
+import { Examination } from '../examination';
+import { Question } from '../question';
 
 interface ExamStats {
   correct: number;
@@ -23,7 +18,6 @@ interface ExamStats {
   styleUrl: './basic-exam.css',
 })
 export class BasicExam {
-  selectedSets = ['Set A', 'Set B'];
   userAnswer = '';
   showAnswer = false;
   currentQuestionIndex = 0;
@@ -35,18 +29,10 @@ export class BasicExam {
     total: 10,
   };
 
-  questions: Question[] = [
-    {
-      id: 1,
-      greek: 'λόγος',
-      english: 'word, reason, logic',
-      explanation: '"Λόγος" (logos) is a fundamental Greek word meaning "word," "reason," or "logic." It\'s the root of English words like "logic," "dialogue," and "epilogue."'
-    },
-    // Add more questions here
-  ];
+  examination = new Examination();
 
   get currentQuestion(): Question {
-    return this.questions[this.currentQuestionIndex];
+    return this.examination.currentQuestion;
   }
 
   get accuracy(): number {
@@ -64,19 +50,18 @@ export class BasicExam {
   }
 
   nextQuestion(): void {
-    if (this.currentQuestionIndex < this.questions.length - 1) {
-      this.currentQuestionIndex++;
-      this.userAnswer = '';
-      this.showAnswer = false;
-    }
+    this.examination.generateQuestion();
+    this.currentQuestionIndex++;
+    this.userAnswer = '';
+    this.showAnswer = false;
   }
 
-  toggleQuestionSet(set: string): void {
-    const index = this.selectedSets.indexOf(set);
-    if (index > -1) {
-      this.selectedSets.splice(index, 1);
-    } else {
-      this.selectedSets.push(set);
-    }
-  }
+  // toggleQuestionSet(set: string): void {
+  //   const index = this.selectedSets.indexOf(set);
+  //   if (index > -1) {
+  //     this.selectedSets.splice(index, 1);
+  //   } else {
+  //     this.selectedSets.push(set);
+  //   }
+  // }
 }

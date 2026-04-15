@@ -13,12 +13,10 @@
         <div class="bg-white rounded-lg shadow-md p-6">
           <h2 class="text-lg font-semibold text-gray-900 mb-4">Select Question Sets</h2>
           <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
-            <label class="flex items-center space-x-3 cursor-pointer" *ngFor="let set of ['Set A', 'Set B', 'Set C', 'Set D', 'Set E']">
-              <input 
-                type="checkbox" 
+            <label class="flex items-center space-x-3 cursor-pointer" *ngFor="let set of ['Set A', 'Set B', 'Set C']">
+              <input
+                type="checkbox"
                 class="w-5 h-5 text-indigo-600 rounded focus:ring-indigo-500"
-                [checked]="selectedSets.includes(set)"
-                (change)="toggleQuestionSet(set)"
               >
               <span class="text-gray-700">{{ set }}</span>
             </label>
@@ -28,11 +26,11 @@
         <!-- Question Display -->
         <div class="bg-white rounded-lg shadow-md p-6">
           <h2 class="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-4">
-            Question {{ currentQuestionIndex + 1 }} of {{ questions.length }}
+            Question {{ currentQuestionIndex + 1 }}
           </h2>
           <div class="bg-indigo-100 border-l-4 border-indigo-600 rounded p-6">
             <p class="text-2xl font-semibold text-gray-900">
-              What is the English translation of "{{ currentQuestion.greek }}"?
+              {{ currentQuestion.prompt }}
             </p>
           </div>
         </div>
@@ -64,7 +62,7 @@
         <div *ngIf="showAnswer" class="bg-white rounded-lg shadow-md p-6 border-t-4 border-green-500 animate-in fade-in">
           <div class="mb-4">
             <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-2">Correct Answer</h3>
-            <p class="text-xl font-semibold text-green-600">{{ currentQuestion.english }}</p>
+            <p class="text-xl font-semibold text-green-600">{{ currentQuestion.answer }}</p>
           </div>
           <div class="mb-6">
             <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-2">Explanation</h3>
@@ -73,15 +71,11 @@
             </p>
           </div>
           <button
-            *ngIf="currentQuestionIndex < questions.length - 1"
             (click)="nextQuestion()"
             class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-4 rounded-lg transition duration-200"
           >
             Next Question
           </button>
-          <div *ngIf="currentQuestionIndex === questions.length - 1" class="bg-green-50 border border-green-200 rounded-lg p-4 text-center">
-            <p class="text-green-800 font-semibold">Exam Complete! 🎉</p>
-          </div>
         </div>
       </div>
 
