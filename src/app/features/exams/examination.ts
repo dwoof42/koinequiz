@@ -61,6 +61,8 @@ interface VerbTables {
     [key: string]: VerbTable;
 }
 
+type VerbTense = 'pres' | 'impf';
+
 export class Examination {
     // Message properties (instead of console.log)
     public currentMessage: string = '';
@@ -76,7 +78,7 @@ export class Examination {
     public noun: boolean = true;
 
     constructor() {
-        this.generateQuestion();
+        // this.generateQuestion();
     }
 
     // Session Stats
@@ -520,8 +522,8 @@ export class Examination {
         this.resetStats();
     }
 
-    public generateQuestion(): Question {
-        this.currentQuestion = this.makeQuestion();
+    public generateQuestion(questionType: string): Question {
+        this.currentQuestion = this.makeQuestion(questionType);
         return this.currentQuestion;
     }
 
@@ -803,12 +805,21 @@ export class Examination {
                 : "";
     }
 
-    private makeVerbQuestion(): Question {
-        const imperfect = !this.rand([0, 1, 2]);
-        const verbsPool = imperfect ? this.SUPPORTED_IMPF_VERBS : this.SUPPORTED_VERBS;
-        const v = this.rand(verbsPool);
+    private makeIndicativeQuestion(): Question {
+        const verbsPool = this.SUPPORTED_VERBS;
+        const tense = "pres";
+        return this.makeVerbQuestion(verbsPool, tense);
+    }
 
-        const tense = imperfect ? "impf" : "pres";
+    private makeImperfectQuestion(): Question {
+        const verbsPool = this.SUPPORTED_IMPF_VERBS;
+        const tense = "impf";
+        return this.makeVerbQuestion(verbsPool, tense);
+    }
+
+    private makeVerbQuestion(verbsPool: VerbEntry[], tense: VerbTense): Question {
+
+        const v = this.rand(verbsPool);
 
         let voice: 'act' | 'mid';
         if (tense === "impf") {
@@ -822,7 +833,7 @@ export class Examination {
         const person = this.rand(this.PERSONS);
         const number = this.rand(this.NUMBERS);
         const form = this.conjugateVerb(v, person, number, voice, tense);
-        if (!form) return this.makeVerbQuestion();
+        if (!form) return this.makeVerbQuestion(verbsPool, tense);
 
         const nicePers = { "1": "1st", "2": "2nd", "3": "3rd" }[person];
         const niceNum = number === "sg" ? "singular" : "plural";
@@ -837,7 +848,20 @@ export class Examination {
         };
     }
 
-    private makeQuestion(): Question {
-        return Math.random() < 0.5 ? this.makeNounQuestion() : this.makeVerbQuestion();
+    private makeQuestion(questionType: string): Question {
+        switch (questionType) {
+            case "noun":
+                return this.makeNounQuestion();
+            case "indicative":
+                return this.makeIndicativeQuestion();
+            case "imperfect":
+                return this.makeImperfectQuestion();
+            case "preposition":
+                return this.makeNounQuestion();
+            case "aorist":
+                return this.makeNounQuestion();
+            default:
+                return this.makeNounQuestion();
+        }
     }
 }

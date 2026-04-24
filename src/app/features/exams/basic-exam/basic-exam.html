@@ -2,8 +2,8 @@
   <div class="max-w-4xl mx-auto">
     <!-- Header -->
     <div class="mb-4">
-      <h1 class="text-3xl font-bold text-gray-900 mb-2">Greek Vocabulary Exam</h1>
-      <p class="text-gray-600">Test your vocabulary knowledge</p>
+      <h1 class="text-3xl font-bold text-gray-900 mb-2">Greek Exam</h1>
+      <p class="text-gray-600"></p>
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -18,6 +18,7 @@
                 type="checkbox"
                 class="w-4 h-4 text-indigo-600 rounded focus:ring-indigo-500"
                 [(ngModel)]="type.selected"
+                (change)="onQuestionTypesChange()"
               >
               <span class="text-gray-700 text-sm">{{ type.value }}</span>
             </label>
@@ -35,7 +36,7 @@
             </p>
           </div>
         </div>
-
+          {{ selectedQuestionTypes}}
         <!-- Answer Input -->
         <div class="bg-white rounded-lg shadow-md p-4">
           <label for="answer" class="block text-sm font-semibold text-gray-900 mb-2">
