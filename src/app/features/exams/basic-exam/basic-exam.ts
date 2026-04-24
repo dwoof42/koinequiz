@@ -4,11 +4,10 @@ import { FormsModule } from '@angular/forms';
 import { Examination } from '../examination';
 import { Question } from '../question';
 
-interface ExamStats {
-  correct: number;
-  incorrect: number;
-  skipped: number;
-  total: number;
+interface QuestionType {
+  key: string;
+  value: string;
+  selected: boolean;
 }
 
 @Component({
@@ -22,30 +21,44 @@ export class BasicExam {
   showAnswer = false;
   currentQuestionIndex = 0;
 
-  stats: ExamStats = {
-    correct: 6,
-    incorrect: 2,
-    skipped: 2,
-    total: 10,
-  };
-
   examination = new Examination();
 
-  get currentQuestion(): Question {
-    return this.examination.currentQuestion;
+  public currentQuestion: Question = this.examination.generateQuestion();
+  public previousQuestion: Question = { type: 'noun', prompt: '', answer: '' };
+  public previousResult = '';
+
+  public questionTypes:QuestionType[] = [
+    {key: 'noun', value: '1/2/ Noun', selected: true},
+    {key: 'indicative', value: 'Indicative', selected: true},
+    {key: 'imperfect', value: 'Imperfect', selected: true},
+    {key: 'preposition', value: 'Preposition', selected: true},
+    {key: 'aorist', value: 'Aorist', selected: true},
+  ];
+
+  public selectedQuestionTypes: string[] = [];
+
+
+  get accuracy(): string {
+    const stats = this.examination.stats;
+    const partial = stats.accent + stats.correct;
+    const total = partial + stats.incorrect;
+    return !!total ? `${partial} / ${total}` : '';
   }
 
-  get accuracy(): number {
-    return this.stats.total > 0 ? Math.round((this.stats.correct / this.stats.total) * 100) : 0;
-  }
-
-  get progressPercentage(): number {
-    const answered = this.stats.correct + this.stats.incorrect;
-    return this.stats.total > 0 ? Math.round((answered / this.stats.total) * 100) : 0;
+  get percentage(): number {
+    const stats = this.examination.stats;
+    const partial = stats.accent + stats.correct;
+    const total = partial + stats.incorrect;
+    return total === 0 ? 0 : Math.round((partial / total) * 100);
   }
 
   checkAnswer(): void {
+    this.previousResult = this.examination.evaluateAnswer(this.userAnswer);
     this.showAnswer = true;
+    this.currentQuestionIndex++;
+    this.previousQuestion = this.currentQuestion;
+    this.currentQuestion = this.examination.generateQuestion();
+
     // Add logic to validate answer and update stats
   }
 

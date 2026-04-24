@@ -80,7 +80,7 @@ export class Examination {
     }
 
     // Session Stats
-    private stats: Stats = {
+    public stats: Stats = {
         correct: 0,
         accent: 0,
         incorrect: 0,
