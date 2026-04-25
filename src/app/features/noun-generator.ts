@@ -1,0 +1,278 @@
+
+import { Question } from "./exams/question";
+
+// Interfaces
+interface NounEntry {
+    lemma: string;
+    gloss: string;
+    gender: 'm' | 'f' | 'n';
+    pattern: string;
+    supported: boolean;
+}
+
+interface NounForm {
+    nom: string;
+    gen: string;
+    dat: string;
+    acc: string;
+}
+
+interface ArticleForms {
+    sg: { m: NounForm; f: NounForm; n: NounForm };
+    pl: { m: NounForm; f: NounForm; n: NounForm };
+}
+
+interface NounPattern {
+    endings: {
+        sg: NounForm;
+        pl: NounForm;
+    };
+}
+
+interface ExceptionForms {
+    [key: string]: {
+        gender: 'm' | 'f' | 'n';
+        forms: {
+            sg: NounForm;
+            pl: NounForm;
+        };
+    };
+}
+
+export class NounGenerator {
+    // Constants
+    private readonly CASES: ('nom' | 'gen' | 'dat' | 'acc')[] = ["nom", "gen", "dat", "acc"];
+    private readonly NUMBERS: ('sg' | 'pl')[] = ["sg", "pl"];
+
+    // Articles
+    private readonly ARTICLES: ArticleForms = {
+        sg: {
+            m: { nom: "ὁ", gen: "τοῦ", dat: "τῷ", acc: "τὸν" },
+            f: { nom: "ἡ", gen: "τῆς", dat: "τῇ", acc: "τὴν" },
+            n: { nom: "τὸ", gen: "τοῦ", dat: "τῷ", acc: "τὸ" },
+        },
+        pl: {
+            m: { nom: "οἱ", gen: "τῶν", dat: "τοῖς", acc: "τοὺς" },
+            f: { nom: "αἱ", gen: "τῶν", dat: "ταῖς", acc: "τὰς" },
+            n: { nom: "τὰ", gen: "τῶν", dat: "τοῖς", acc: "τὰ" },
+        },
+    };
+
+    // Noun Patterns
+    private readonly NOUN_PATTERNS: { [key: string]: NounPattern } = {
+        "1f_eta": {
+            endings: {
+                sg: { nom: "ή", gen: "ῆς", dat: "ῇ", acc: "ήν" },
+                pl: { nom: "αί", gen: "ῶν", dat: "αῖς", acc: "άς" },
+            },
+        },
+        "1f_alpha": {
+            endings: {
+                sg: { nom: "α", gen: "ας", dat: "ᾳ", acc: "αν" },
+                pl: { nom: "αι", gen: "ῶν", dat: "αis", acc: "ᾱς" },
+            },
+        },
+        "2m": {
+            endings: {
+                sg: { nom: "ος", gen: "ου", dat: "ῳ", acc: "ον" },
+                pl: { nom: "οι", gen: "ων", dat: "οis", acc: "ους" },
+            },
+        },
+        "2n": {
+            endings: {
+                sg: { nom: "ον", gen: "ου", dat: "ῳ", acc: "ον" },
+                pl: { nom: "α", gen: "ων", dat: "οis", acc: "α" },
+            },
+        },
+    };
+
+    // Exception Forms
+    private readonly NOOUN_EXCEPTION_FORMS: ExceptionForms = {
+        "φωνή": {
+            gender: "f",
+            forms: {
+                sg: { nom: "ἡ φωνή", gen: "τῆς φωνῆς", dat: "τῇ φωνῇ", acc: "τὴν φωνήν" },
+                pl: { nom: "αἱ φωναί", gen: "τῶν φωνῶν", dat: "ταῖς φωναῖς", acc: "τὰς φωνάς" },
+            },
+        },
+        "καρδία": {
+            gender: "f",
+            forms: {
+                sg: { nom: "ἡ καρδία", gen: "τῆς καρδίας", dat: "τῇ καρδίᾳ", acc: "τὴν καρδίαν" },
+                pl: { nom: "αἱ καρδίαι", gen: "τῶν καρδιῶν", dat: "ταῖς καρδίαις", acc: "τὰς καρδίας" },
+            },
+        },
+        "δόξα": {
+            gender: "f",
+            forms: {
+                sg: { nom: "ἡ δόξα", gen: "τῆς δόξης", dat: "τῇ δόξῃ", acc: "τὴν δόξαν" },
+                pl: { nom: "αἱ δόξαι", gen: "τῶν δοξῶν", dat: "ταῖς δόξαις", acc: "τὰς δόξας" },
+            },
+        },
+        "ἁμαρτία": {
+            gender: "f",
+            forms: {
+                sg: { nom: "ἡ ἁμαρτία", gen: "τῆς ἁμαρτίας", dat: "τῇ ἁμαρτίᾳ", acc: "τὴν ἁμαρτίαν" },
+                pl: { nom: "αἱ ἁμαρτίαι", gen: "τῶν ἁμαρτιῶν", dat: "ταῖς ἁμαρτίαις", acc: "τὰς ἁμαρτίας" },
+            },
+        },
+    };
+
+    // Vocabulary
+    private readonly NOUNS: NounEntry[] = [
+        { lemma: "λόγος", gloss: "word", gender: "m", pattern: "2m", supported: true },
+        { lemma: "θεός", gloss: "God, god", gender: "m", pattern: "2m", supported: true },
+        { lemma: "κύριος", gloss: "lord, master", gender: "m", pattern: "2m", supported: true },
+        { lemma: "ἄνθρωπος", gloss: "man, person", gender: "m", pattern: "2m", supported: true },
+        { lemma: "υἱός", gloss: "son", gender: "m", pattern: "2m", supported: true },
+        { lemma: "δοῦλος", gloss: "slave, servant", gender: "m", pattern: "2m", supported: true },
+        { lemma: "ἔργον", gloss: "work, deed", gender: "n", pattern: "2n", supported: true },
+        { lemma: "δῶρον", gloss: "gift", gender: "n", pattern: "2n", supported: true },
+        { lemma: "τέκνον", gloss: "child", gender: "n", pattern: "2n", supported: true },
+        { lemma: "φωνή", gloss: "voice", gender: "f", pattern: "1f_eta", supported: true },
+        { lemma: "χώρα", gloss: "land", gender: "f", pattern: "1f_alpha", supported: true },
+        { lemma: "καρδία", gloss: "heart", gender: "f", pattern: "1f_alpha", supported: true },
+        { lemma: "δόξα", gloss: "glory", gender: "f", pattern: "1f_alpha", supported: true },
+        { lemma: "ἁμαρτία", gloss: "sin", gender: "f", pattern: "1f_alpha", supported: true },
+
+        { lemma: "πνεῦμα", gloss: "spirit", gender: "n", pattern: "3n", supported: false },
+        { lemma: "πατήρ", gloss: "father", gender: "m", pattern: "3m", supported: false },
+        { lemma: "γυνή", gloss: "woman", gender: "f", pattern: "3f", supported: false },
+        { lemma: "ἀνήρ", gloss: "man (male)", gender: "m", pattern: "3m", supported: false },
+        { lemma: "ὄνομα", gloss: "name", gender: "n", pattern: "3n", supported: false },
+        { lemma: "οὐρανός", gloss: "heaven", gender: "m", pattern: "2m", supported: false },
+        { lemma: "γῆ", gloss: "earth, land", gender: "f", pattern: "1f_eta", supported: false },
+        { lemma: "οἶκος", gloss: "house", gender: "m", pattern: "2m", supported: false },
+        { lemma: "ὁδός", gloss: "way, road", gender: "f", pattern: "2m", supported: false },
+        { lemma: "ἀδελφός", gloss: "brother", gender: "m", pattern: "2m", supported: false },
+        { lemma: "ἀγάπη", gloss: "love", gender: "f", pattern: "1f_eta", supported: false },
+        { lemma: "πίστις", gloss: "faith", gender: "f", pattern: "3f", supported: false },
+        { lemma: "βασιλεία", gloss: "kingdom", gender: "f", pattern: "1f_alpha", supported: false },
+        { lemma: "ζωή", gloss: "life", gender: "f", pattern: "1f_eta", supported: false },
+        { lemma: "κόσμος", gloss: "world", gender: "m", pattern: "2m", supported: false },
+        { lemma: "νόμος", gloss: "law", gender: "m", pattern: "2m", supported: false },
+        { lemma: "μαθητής", gloss: "disciple", gender: "m", pattern: "1m", supported: false },
+        { lemma: "ἄγγελος", gloss: "angel", gender: "m", pattern: "3m", supported: false },
+        { lemma: "θάνατος", gloss: "death", gender: "m", pattern: "2m", supported: false },
+        { lemma: "ἐκκλησία", gloss: "assembly, church", gender: "f", pattern: "1f_alpha", supported: false },
+        { lemma: "χάρις", gloss: "grace", gender: "f", pattern: "3f", supported: false },
+        { lemma: "εἰρήνη", gloss: "peace", gender: "f", pattern: "1f_eta", supported: false },
+        { lemma: "προφήτης", gloss: "prophet", gender: "m", pattern: "1m", supported: false },
+        { lemma: "γραφὴ", gloss: "writing, Scripture", gender: "f", pattern: "1f_eta", supported: false },
+        { lemma: "σῶμα", gloss: "body", gender: "n", pattern: "3n", supported: false },
+        { lemma: "πόλις", gloss: "city", gender: "f", pattern: "3f", supported: false },
+        { lemma: "πλοῖον", gloss: "boat", gender: "n", pattern: "2n", supported: false },
+        { lemma: "οἶνος", gloss: "wine", gender: "m", pattern: "2m", supported: false },
+        { lemma: "ἄρτος", gloss: "bread", gender: "m", pattern: "2m", supported: false },
+        { lemma: "σημεῖον", gloss: "sign", gender: "n", pattern: "2n", supported: false },
+        { lemma: "χειρ", gloss: "hand", gender: "f", pattern: "3f", supported: false },
+        { lemma: "ποὺς", gloss: "foot", gender: "m", pattern: "3m", supported: false },
+        { lemma: "ὕδωρ", gloss: "water", gender: "n", pattern: "3n", supported: false },
+        { lemma: "ἱερόν", gloss: "temple", gender: "n", pattern: "2n", supported: false },
+        { lemma: "ναός", gloss: "temple (inner)", gender: "m", pattern: "2m", supported: false },
+        { lemma: "ἡμέρα", gloss: "day", gender: "f", pattern: "1f_alpha", supported: false },
+        { lemma: "ἀρχιερεύς", gloss: "high priest", gender: "m", pattern: "3m", supported: false },
+        { lemma: "βίβλος", gloss: "book", gender: "f", pattern: "2m", supported: false },
+        { lemma: "ψυχή", gloss: "soul, life", gender: "f", pattern: "1f_eta", supported: false },
+        { lemma: "ὄχλος", gloss: "crowd", gender: "m", pattern: "2m", supported: false },
+        { lemma: "θυγάτηρ", gloss: "daughter", gender: "f", pattern: "3f", supported: false },
+        { lemma: "μήτηρ", gloss: "mother", gender: "f", pattern: "3f", supported: false },
+        { lemma: "ἀλήθεια", gloss: "truth", gender: "f", pattern: "1f_alpha", supported: false },
+        { lemma: "σάββατον", gloss: "Sabbath", gender: "n", pattern: "2n", supported: false },
+
+        { lemma: "Ἰησοῦς", gloss: "Jesus", gender: "m", pattern: "3m", supported: false },
+        { lemma: "Χριστός", gloss: "Christ, Messiah", gender: "m", pattern: "2m", supported: false },
+        { lemma: "εὐαγγέλιον", gloss: "good news, gospel", gender: "n", pattern: "2n", supported: false },
+        { lemma: "ἀπόστολος", gloss: "apostle, envoy", gender: "m", pattern: "2m", supported: false },
+        { lemma: "διδάσκαλος", gloss: "teacher", gender: "m", pattern: "2m", supported: false },
+        { lemma: "ὄρος", gloss: "mountain", gender: "n", pattern: "3n", supported: false },
+        { lemma: "θάλασσα", gloss: "sea", gender: "f", pattern: "1f_alpha", supported: false },
+        { lemma: "ποταμός", gloss: "river", gender: "m", pattern: "2m", supported: false },
+        { lemma: "λίμνη", gloss: "lake", gender: "f", pattern: "1f_eta", supported: false },
+        { lemma: "πῦρ", gloss: "fire", gender: "n", pattern: "3n", supported: false },
+        { lemma: "λίθος", gloss: "stone", gender: "m", pattern: "2m", supported: false },
+        { lemma: "δένδρον", gloss: "tree", gender: "n", pattern: "2n", supported: false },
+        { lemma: "καρπός", gloss: "fruit", gender: "m", pattern: "2m", supported: false },
+        { lemma: "σπέρμα", gloss: "seed", gender: "n", pattern: "3n", supported: false },
+        { lemma: "ἀγρός", gloss: "field", gender: "m", pattern: "2m", supported: false },
+        { lemma: "ὀφθαλμός", gloss: "eye", gender: "m", pattern: "2m", supported: false },
+        { lemma: "στόμα", gloss: "mouth", gender: "n", pattern: "3n", supported: false },
+        { lemma: "ὠτίον", gloss: "ear", gender: "n", pattern: "2n", supported: false },
+        { lemma: "γλῶσσα", gloss: "tongue, language", gender: "f", pattern: "1f_alpha", supported: false },
+        { lemma: "χείρ", gloss: "hand", gender: "f", pattern: "3f", supported: false },
+        { lemma: "πρόσωπον", gloss: "face, person", gender: "n", pattern: "2n", supported: false },
+        { lemma: "κεφαλή", gloss: "head", gender: "f", pattern: "1f_eta", supported: false },
+        { lemma: "ἱμάτιον", gloss: "garment, cloak", gender: "n", pattern: "2n", supported: false },
+        { lemma: "ὑπόδημα", gloss: "sandal", gender: "n", pattern: "3n", supported: false },
+        { lemma: "ἥλιος", gloss: "sun", gender: "m", pattern: "2m", supported: false },
+        { lemma: "σελήνη", gloss: "moon", gender: "f", pattern: "1f_eta", supported: false },
+        { lemma: "ἄστρον", gloss: "star", gender: "n", pattern: "2n", supported: false },
+        { lemma: "χρόνος", gloss: "time", gender: "m", pattern: "2m", supported: false },
+        { lemma: "καιρός", gloss: "season, opportune time", gender: "m", pattern: "2m", supported: false },
+        { lemma: "ἔτος", gloss: "year", gender: "n", pattern: "3n", supported: false },
+        { lemma: "τόπος", gloss: "place", gender: "m", pattern: "2m", supported: false },
+        { lemma: "ἔθνος", gloss: "nation, Gentiles", gender: "n", pattern: "3n", supported: false },
+        { lemma: "λαός", gloss: "people", gender: "m", pattern: "2m", supported: false },
+        { lemma: "βασιλεύς", gloss: "king", gender: "m", pattern: "3m", supported: false },
+        { lemma: "ἱερεύς", gloss: "priest", gender: "m", pattern: "3m", supported: false },
+        { lemma: "θρόνος", gloss: "throne", gender: "m", pattern: "2m", supported: false },
+        { lemma: "σταυρός", gloss: "cross", gender: "m", pattern: "2m", supported: false },
+        { lemma: "μαρτυρία", gloss: "testimony", gender: "f", pattern: "1f_alpha", supported: false },
+        { lemma: "ἐντολή", gloss: "commandment", gender: "f", pattern: "1f_eta", supported: false },
+        { lemma: "παραβολή", gloss: "parable", gender: "f", pattern: "1f_eta", supported: false },
+        { lemma: "σοφία", gloss: "wisdom", gender: "f", pattern: "1f_alpha", supported: false },
+        { lemma: "ἔλεος", gloss: "mercy", gender: "n", pattern: "3n", supported: false },
+        { lemma: "κρίσις", gloss: "judgment", gender: "f", pattern: "3f", supported: false },
+        { lemma: "κοινωνία", gloss: "fellowship, sharing", gender: "f", pattern: "1f_alpha", supported: false },
+        { lemma: "διαθήκη", gloss: "covenant", gender: "f", pattern: "1f_eta", supported: false },
+        { lemma: "ἀδελφή", gloss: "sister", gender: "f", pattern: "1f_eta", supported: false },
+        { lemma: "ἐχθρός", gloss: "enemy", gender: "m", pattern: "2m", supported: false },
+        { lemma: "φίλος", gloss: "friend", gender: "m", pattern: "2m", supported: false },
+        { lemma: "ῥῆμα", gloss: "word, saying", gender: "n", pattern: "3n", supported: false },
+        { lemma: "πλοῦτος", gloss: "riches, wealth", gender: "m", pattern: "2m", supported: false },
+    ];
+
+    // Computed property
+    private get SUPPORTED_NOUNS(): NounEntry[] {
+        return this.NOUNS.filter(n => n.supported);
+    }
+
+    // Utility method
+    private rand<T>(arr: T[]): T {
+        return arr[Math.floor(Math.random() * arr.length)];
+    }
+
+    // Decline a noun with article
+    private declineNoun(nounEntry: NounEntry, kase: 'nom' | 'gen' | 'dat' | 'acc', number: 'sg' | 'pl'): string | null {
+        const { lemma, gender, pattern } = nounEntry;
+        const ex = this.NOOUN_EXCEPTION_FORMS[lemma];
+        if (ex?.forms?.[number]?.[kase]) return ex.forms[number][kase];
+
+        const pat = this.NOUN_PATTERNS[pattern];
+        if (!pat) return null;
+        const art = this.ARTICLES[number][gender]?.[kase];
+        if (!art) return null;
+
+        const nomEnding = pat.endings.sg.nom;
+        if (!lemma.endsWith(nomEnding)) return null;
+        const stem = lemma.slice(0, -nomEnding.length);
+        const end = pat.endings[number][kase];
+        return `${art} ${stem}${end}`;
+    }
+
+    // Create a noun question
+    public makeNounQuestion(): Question {
+        const n = this.rand(this.SUPPORTED_NOUNS);
+        const kase = this.rand(this.CASES);
+        const number = this.rand(this.NUMBERS);
+        const correct = this.declineNoun(n, kase, number);
+        if (!correct) return this.makeNounQuestion();
+        const niceCase = { nom: "nominative", gen: "genitive", dat: "dative", acc: "accusative" }[kase];
+        const niceNum = number === "sg" ? "singular" : "plural";
+        return {
+            type: "noun",
+            prompt: `Decline **${n.lemma}** → ${niceNum} ${niceCase} (${n.gloss})`,
+            answer: correct,
+        };
+    }
+}
