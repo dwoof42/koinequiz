@@ -71,6 +71,7 @@
           }"
         >
           <div class="mb-3">
+
             <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-2">Correct Answer</h3>
             <p
               class="text-lg font-semibold"
@@ -79,7 +80,7 @@
                 'text-red-600': previousResult === 'incorrect',
                 'text-blue-600': previousResult !== 'correct' && previousResult !== 'incorrect'
               }"
-            >{{ previousQuestion.answer }}</p>
+            >{{ previousQuestion.answer }} ({{previousAnswer}})</p>
           </div>
           <div class="mb-4">
             <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-2">Explanation</h3>

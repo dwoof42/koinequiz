@@ -35,6 +35,7 @@ export class BasicExam implements OnInit {
   public currentQuestion: Question = { type: 'noun', prompt: '', answer: '' };
   public previousQuestion: Question = { type: 'noun', prompt: '', answer: '' };
   public previousResult = '';
+  public previousAnswer = '';
 
   public questionTypes: QuestionType[] = [
     { key: 'noun', value: '1/2 Noun', selected: true },
@@ -78,7 +79,9 @@ export class BasicExam implements OnInit {
   }
   checkAnswer(): void {
     this.previousResult = this.examination.evaluateAnswer(this.userAnswer);
+    this.previousAnswer = this.userAnswer;
     this.showAnswer = true;
+    this.userAnswer = '';
     this.currentQuestionIndex++;
     this.previousQuestion = this.currentQuestion;
     this.currentQuestion = this.generateQuestion();
