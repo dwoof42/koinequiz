@@ -1,6 +1,7 @@
 import { Question } from "./question";
 import { NounGenerator } from "../noun-generator";
 import { VerbGenerator } from "./verb-generator";
+import { PrepGenerator } from '../prep-generator';
 
 // Interfaces
 interface Stats {
@@ -27,6 +28,7 @@ export class Examination {
     // Noun Generator
     private nounGenerator: NounGenerator = new NounGenerator();
     private verbGenerator: VerbGenerator = new VerbGenerator();
+    private prepGenerator: PrepGenerator = new PrepGenerator();
 
     constructor() {
         // this.generateQuestion();
@@ -228,7 +230,7 @@ export class Examination {
             case "imperfect":
                 return this.verbGenerator.makeImperfectQuestion();
             case "preposition":
-                return this.nounGenerator.makeNounQuestion();
+                return this.prepGenerator.makePrepositionQuestion();
             case "aorist":
                 return this.nounGenerator.makeNounQuestion();
             default:
