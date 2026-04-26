@@ -1,5 +1,5 @@
 <div class="bg-gradient-to-br from-blue-50 to-indigo-50 p-4">
-  <div class="max-w-4xl mx-auto">
+  <div class="max-w-6xl mx-auto">
     <!-- Header -->
     <div class="mb-4">
       <h1 class="text-3xl font-bold text-gray-900 mb-2">Greek Exam</h1>
@@ -36,7 +36,6 @@
             </p>
           </div>
         </div>
-          {{ selectedQuestionTypes}}
         <!-- Answer Input -->
         <div class="bg-white rounded-lg shadow-md p-4">
           <label for="answer" class="block text-sm font-semibold text-gray-900 mb-2">
@@ -70,9 +69,8 @@
             'border-blue-500': previousResult !== 'correct' && previousResult !== 'incorrect'
           }"
         >
-          <div class="mb-3">
-
-            <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-2">Correct Answer</h3>
+          <div class="mb-2 grid grid-cols-[1fr_2fr] gap-2">
+            <h4 class="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-2">Correct Answer</h4>
             <p
               class="text-lg font-semibold"
               [ngClass]="{
@@ -80,9 +78,18 @@
                 'text-red-600': previousResult === 'incorrect',
                 'text-blue-600': previousResult !== 'correct' && previousResult !== 'incorrect'
               }"
-            >{{ previousQuestion.answer }} ({{previousAnswer}})</p>
+            >{{ previousQuestion.answer }}</p>
+            <h4 class="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-2">Current Guess</h4>
+            <p
+              class="text-lg font-semibold"
+              [ngClass]="{
+                'text-green-600': previousResult === 'correct',
+                'text-red-600': previousResult === 'incorrect',
+                'text-blue-600': previousResult !== 'correct' && previousResult !== 'incorrect'
+              }"
+            >{{previousAnswer}}</p>
           </div>
-          <div class="mb-4">
+          <div class="mb-2">
             <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-2">Explanation</h3>
             <p class="text-gray-700">
               {{ previousQuestion.explanation }}
