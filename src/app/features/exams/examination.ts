@@ -219,28 +219,6 @@ export class Examination {
     }
 
 
-    private contractAlphaPres(stem: string, person: string): string {
-        const map: { [key: string]: string } = {
-            "1s": "ῶ", "2s": "ᾷς", "3s": "ᾷ",
-            "1p": "ῶμεν", "2p": "ᾶτε", "3p": "ῶσι(ν)",
-        };
-        return stem + map[person];
-    }
-
-    private contractEpsilonPres(stem: string, person: string): string {
-        const map: { [key: string]: string } = {
-            "1s": "ῶ", "2s": "εῖς", "3s": "εῖ",
-            "1p": "οῦμεν", "2p": "εῖτε", "3p": "οῦσι(ν)",
-        };
-        return stem + map[person];
-    }
-
-    private contractTypeLabel(t: string): string {
-        return t === "contract_ao" ? "-άω"
-            : t === "contract_eo" ? "-έω"
-                : "";
-    }
-
     private makeQuestion(questionType: string): Question {
         switch (questionType) {
             case "noun":
