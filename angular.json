@@ -33,6 +33,7 @@
           },
           "configurations": {
             "production": {
+              "baseHref": "/koinequiz/",
               "budgets": [
                 {
                   "type": "initial",
