@@ -14,8 +14,7 @@
           <h2 class="text-lg font-semibold text-gray-900 mb-3">Select Question Sets</h2>
           <div class="grid grid-cols-2 md:grid-cols-5 gap-3">
             <label class="flex items-center space-x-2 cursor-pointer" *ngFor="let type of questionTypes">
-              <input type="checkbox" class="w-4 h-4 text-indigo-600 rounded focus:ring-indigo-500" autocomplete="off"
-                spellcheck="false" autocorrect="off" autocapitalize="off" [(ngModel)]="type.selected"
+              <input type="checkbox" class="w-4 h-4 text-indigo-600 rounded focus:ring-indigo-500" [(ngModel)]="type.selected"
                 (change)="onQuestionTypesChange()">
               <span class="text-gray-700 text-sm">{{ type.value }}</span>
             </label>
@@ -39,7 +38,10 @@
             Your Answer
           </label>
           <div class="space-y-3">
-            <input type="text" id="answer" placeholder="Enter your answer here..." [(ngModel)]="userAnswer"
+            <input type="text" id="answer" placeholder="Enter your answer here..."
+           autocomplete="off"
+                spellcheck="false" autocorrect="off" autocapitalize="off"   
+                [(ngModel)]="userAnswer"
               (keyup.enter)="checkAnswer()"
               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition text-3xl">
             <button (click)="checkAnswer()"
