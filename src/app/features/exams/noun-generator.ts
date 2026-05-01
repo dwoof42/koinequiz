@@ -1,5 +1,5 @@
 
-import { Question } from "./exams/question";
+import { Question } from "./question";
 import { NounEntry } from "./noun-entry";
 import { NOUNS } from './nouns';
 

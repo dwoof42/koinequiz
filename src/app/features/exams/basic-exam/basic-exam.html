@@ -14,9 +14,9 @@
           <h2 class="text-lg font-semibold text-gray-900 mb-3">Select Question Sets</h2>
           <div class="grid grid-cols-2 md:grid-cols-5 gap-3">
             <label class="flex items-center space-x-2 cursor-pointer" *ngFor="let type of questionTypes">
-              <input type="checkbox" class="w-4 h-4 text-indigo-600 rounded focus:ring-indigo-500"
-                autocomplete="off"
-                [(ngModel)]="type.selected" (change)="onQuestionTypesChange()">
+              <input type="checkbox" class="w-4 h-4 text-indigo-600 rounded focus:ring-indigo-500" autocomplete="off"
+                spellcheck="false" autocorrect="off" autocapitalize="off" [(ngModel)]="type.selected"
+                (change)="onQuestionTypesChange()">
               <span class="text-gray-700 text-sm">{{ type.value }}</span>
             </label>
           </div>
@@ -114,13 +114,11 @@
           </div>
 
         </div>
-          <br />
+        <br />
         <div>
           @if(currentQuestion.type==='prep') {
-          <a 
-            href="assets/greek_prepositions.pdf"  
-            target="_blank" >Prepositions Help
-            </a>
+          <a href="assets/greek_prepositions.pdf" target="_blank">Prepositions Help
+          </a>
           }
         </div>
       </div>

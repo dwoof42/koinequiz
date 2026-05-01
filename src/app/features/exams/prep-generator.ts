@@ -1,5 +1,5 @@
-import { Question } from './exams/question';
-import { prepositions } from './prepositions';
+import { Question } from './question';
+import { prepositions } from './greek-prepositions';
 
 
 export class PrepGenerator {

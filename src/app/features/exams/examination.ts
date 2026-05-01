@@ -1,7 +1,7 @@
 import { Question } from "./question";
-import { NounGenerator } from "../noun-generator";
+import { NounGenerator } from "./noun-generator";
 import { VerbGenerator } from "./verb-generator";
-import { PrepGenerator } from '../prep-generator';
+import { PrepGenerator } from './prep-generator';
 
 // Interfaces
 interface Stats {
