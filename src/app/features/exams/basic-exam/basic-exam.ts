@@ -3,11 +3,18 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Examination } from '../examination';
 import { Question } from '../question';
+import { LocalStorageService } from '../../../services/local-storage.service';
 
 interface QuestionType {
   key: string;
   value: string;
   selected: boolean;
+}
+
+interface BasicExamState {
+  questionTypes: QuestionType[];
+  previousAnswer: string;
+  previousResult: string;
 }
 
 @Component({
@@ -21,14 +28,35 @@ export class BasicExam implements OnInit {
   showAnswer = false;
   currentQuestionIndex = 0;
 
+  constructor(private localStorage: LocalStorageService) {}
+
   ngOnInit(): void {
     this.initiatizeQuestion();
+    this.restoreState();
   }
 
   onQuestionTypesChange() {
     this.initiatizeQuestion();
+    this.saveState();
   }
 
+  private restoreState(): void {
+    const state = this.localStorage.getJson<BasicExamState>('basicExamState');
+    if (state) {
+      this.questionTypes = state.questionTypes;
+      this.previousAnswer = state.previousAnswer;
+      this.previousResult = state.previousResult;
+    }
+  }
+
+  private saveState(): void {
+    const state: BasicExamState = {
+      questionTypes: this.questionTypes,
+      previousAnswer: this.previousAnswer,
+      previousResult: this.previousResult,
+    };
+    this.localStorage.setJson('basicExamState', state);
+  }
 
   examination = new Examination();
 
@@ -85,6 +113,7 @@ export class BasicExam implements OnInit {
     this.currentQuestionIndex++;
     this.previousQuestion = this.currentQuestion;
     this.currentQuestion = this.generateQuestion();
+    this.saveState();
 
     // Add logic to validate answer and update stats
   }

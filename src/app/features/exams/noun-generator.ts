@@ -64,19 +64,19 @@ export class NounGenerator {
         "1f_alpha": {
             endings: {
                 sg: { nom: "α", gen: "ας", dat: "ᾳ", acc: "αν" },
-                pl: { nom: "αι", gen: "ῶν", dat: "αis", acc: "ᾱς" },
+                pl: { nom: "αι", gen: "ῶν", dat: "αiς", acc: "ᾱς" },
             },
         },
         "2m": {
             endings: {
                 sg: { nom: "ος", gen: "ου", dat: "ῳ", acc: "ον" },
-                pl: { nom: "οι", gen: "ων", dat: "οis", acc: "ους" },
+                pl: { nom: "οι", gen: "ων", dat: "οiς", acc: "ους" },
             },
         },
         "2n": {
             endings: {
                 sg: { nom: "ον", gen: "ου", dat: "ῳ", acc: "ον" },
-                pl: { nom: "α", gen: "ων", dat: "οis", acc: "α" },
+                pl: { nom: "α", gen: "ων", dat: "οiς", acc: "α" },
             },
         },
     };
