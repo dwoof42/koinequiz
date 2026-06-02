@@ -1,16 +1,10 @@
 
 import { Question } from "./question";
-import { NounEntry } from "./noun-entry";
+import { NounEntry, NounForm } from "./noun-entry";
 import { NOUNS } from './nouns';
 
 // Interfaces
 
-interface NounForm {
-    nom: string;
-    gen: string;
-    dat: string;
-    acc: string;
-}
 
 interface ArticleForms {
     sg: { m: NounForm; f: NounForm; n: NounForm };
@@ -124,23 +118,37 @@ export class NounGenerator {
     }
 
     // Decline a noun with article
-    private declineNoun(nounEntry: NounEntry, kase: 'nom' | 'gen' | 'dat' | 'acc', number: 'sg' | 'pl'): string | null {
+    private declineNoun(
+        nounEntry: NounEntry,
+        kase: 'nom' | 'gen' | 'dat' | 'acc',
+        number: 'sg' | 'pl'
+    ): string | null {
+
+        if (nounEntry.forms) {
+            return nounEntry.forms[number][kase];
+        }
+
         const { lemma, gender, pattern } = nounEntry;
+
         const ex = this.NOOUN_EXCEPTION_FORMS[lemma];
-        if (ex?.forms?.[number]?.[kase]) return ex.forms[number][kase];
+        if (ex?.forms?.[number]?.[kase]) {
+            return ex.forms[number][kase];
+        }
 
         const pat = this.NOUN_PATTERNS[pattern];
         if (!pat) return null;
+
         const art = this.ARTICLES[number][gender]?.[kase];
         if (!art) return null;
 
         const nomEnding = pat.endings.sg.nom;
         if (!lemma.endsWith(nomEnding)) return null;
+
         const stem = lemma.slice(0, -nomEnding.length);
         const end = pat.endings[number][kase];
+
         return `${art} ${stem}${end}`;
     }
-
     // Create a noun question
     public makeNounQuestion(): Question {
         const n = this.rand(this.SUPPORTED_NOUNS);
