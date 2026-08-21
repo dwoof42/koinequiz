@@ -224,7 +224,9 @@ export class Examination {
     private makeQuestion(questionType: string): Question {
         switch (questionType) {
             case "noun":
-                return this.nounGenerator.makeNounQuestion();
+                return this.nounGenerator.makeNounQuestion(false);
+            case "thirdNoun":
+                return this.nounGenerator.makeNounQuestion(true);
             case "indicative":
                 return this.verbGenerator.makeIndicativeQuestion();
             case "imperfect":
@@ -232,9 +234,9 @@ export class Examination {
             case "preposition":
                 return this.prepGenerator.makePrepositionQuestion();
             case "aorist":
-                return this.nounGenerator.makeNounQuestion();
+                return this.nounGenerator.makeNounQuestion(false);
             default:
-                return this.nounGenerator.makeNounQuestion();
+                return this.nounGenerator.makeNounQuestion(false);
         }
     }
 }

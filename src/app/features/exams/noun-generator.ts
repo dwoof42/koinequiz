@@ -5,7 +5,6 @@ import { NOUNS } from './nouns';
 
 // Interfaces
 
-
 interface ArticleForms {
     sg: { m: NounForm; f: NounForm; n: NounForm };
     pl: { m: NounForm; f: NounForm; n: NounForm };
@@ -149,13 +148,21 @@ export class NounGenerator {
 
         return `${art} ${stem}${end}`;
     }
+    
+    private getRandomNoun(third: boolean): NounEntry {
+        const nouns = this.SUPPORTED_NOUNS
+            .filter(n => n.pattern.startsWith('3') === third);
+
+        return this.rand(nouns);
+    }
+
     // Create a noun question
-    public makeNounQuestion(): Question {
-        const n = this.rand(this.SUPPORTED_NOUNS);
+    public makeNounQuestion(third: boolean): Question {
+        const n = this.getRandomNoun(third);
         const kase = this.rand(this.CASES);
         const number = this.rand(this.NUMBERS);
         const correct = this.declineNoun(n, kase, number);
-        if (!correct) return this.makeNounQuestion();
+        if (!correct) return this.makeNounQuestion(third);
         const niceCase = { nom: "nominative", gen: "genitive", dat: "dative", acc: "accusative" }[kase];
         const niceNum = number === "sg" ? "singular" : "plural";
         return {
@@ -163,5 +170,6 @@ export class NounGenerator {
             prompt: `Decline **${n.lemma}** → ${niceNum} ${niceCase} (${n.gloss})`,
             answer: correct,
         };
+
     }
 }

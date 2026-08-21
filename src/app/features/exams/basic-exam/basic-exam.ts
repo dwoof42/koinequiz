@@ -66,7 +66,8 @@ export class BasicExam implements OnInit {
   public previousAnswer = '';
 
   public questionTypes: QuestionType[] = [
-    { key: 'noun', value: 'Nouns', selected: true },
+    { key: 'noun', value: 'Nouns (1,2)', selected: true },
+    { key: 'thirdNoun', value: 'Nouns (3)', selected: true },
     { key: 'indicative', value: 'Indicative', selected: true },
     { key: 'imperfect', value: 'Imperfect', selected: true },
     { key: 'preposition', value: 'Preposition', selected: true },
